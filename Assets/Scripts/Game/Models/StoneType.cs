@@ -7,6 +7,6 @@ namespace Game.Models
         Blue,
         Green,
         Yellow,
-        Pink
+        Purple
     }
 }

@@ -18,7 +18,7 @@ namespace Common.Components
             _pool = pool;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             _pool.Despawn(this);
         }
@@ -27,10 +27,6 @@ namespace Common.Components
     public class MonoPoolable<T> : MonoPoolable where T : MonoPoolable
     {
         public class Factory : PlaceholderFactory<T>
-        {
-        }
-
-        public class Pool : MonoMemoryPool<IMemoryPool, T>
         {
         }
     }

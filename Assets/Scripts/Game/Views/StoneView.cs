@@ -5,14 +5,15 @@ using Zenject;
 namespace Game.Views
 {
     [RequireComponent(typeof(SpriteRenderer))]
-    public class Stone : MonoPoolable<Stone>
+    public class StoneView : MonoPoolable<StoneView>
     {
-        private SpriteRenderer _spriteRenderer;
+        [SerializeField] private SpriteRenderer _spriteRenderer;
         private IMemoryPool _pool;
 
         private void Awake()
         {
-            _spriteRenderer = GetComponent<SpriteRenderer>();
+            if (!_spriteRenderer)
+                _spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
         public void SetSprite(Sprite sprite)

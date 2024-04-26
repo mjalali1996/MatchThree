@@ -33,20 +33,21 @@ namespace Game.Models
                 var board = _level._board;
                 if (board != null)
                 {
+                    EditorGUILayout.BeginHorizontal();
                     for (var i = 0; i < board.Rows.Count; i++)
                     {
-                        EditorGUILayout.BeginHorizontal();
                         var row = board.Rows[i];
+                        EditorGUILayout.BeginVertical();
                         for (var j = 0; j < row.Columns.Count; j++)
                         {
-                            EditorGUILayout.BeginVertical();
                             var cell = row.Columns[j];
                             cell.StoneType = (StoneType)EditorGUILayout.EnumPopup(cell.StoneType);
-                            EditorGUILayout.EndVertical();
                         }
 
-                        EditorGUILayout.EndHorizontal();
+                        EditorGUILayout.EndVertical();
                     }
+
+                    EditorGUILayout.EndHorizontal();
                 }
 
 

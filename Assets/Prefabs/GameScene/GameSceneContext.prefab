@@ -79,3 +79,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cellPrefab: {fileID: -5533715681099729085, guid: 4c389048b6ec224d597964770077f87a, type: 3}
   _stonePrefab: {fileID: 7660824970671991075, guid: ac4ef14540a2671c7b666f028aa461a0, type: 3}
+  _stoneSpriteContainer: {fileID: 11400000, guid: 3da2496fea7990796a0ed2a6034c4cc6, type: 2}
