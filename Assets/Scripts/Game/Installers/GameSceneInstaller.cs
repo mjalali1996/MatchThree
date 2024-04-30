@@ -2,7 +2,6 @@ using Containers;
 using Game.Presenters;
 using Game.Views;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 namespace Game.Installers
@@ -10,9 +9,7 @@ namespace Game.Installers
     public class GameSceneInstaller : MonoInstaller
     {
         [SerializeField] private CellView _cellPrefab;
-
-        [FormerlySerializedAs("_stonePrefab")] [SerializeField]
-        private StoneView _stoneViewPrefab;
+        [SerializeField] private StoneView _stoneViewPrefab;
 
         [SerializeField] private SpriteContainer _stoneSpriteContainer;
 
