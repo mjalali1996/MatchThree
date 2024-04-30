@@ -22,7 +22,6 @@ namespace Game.Views
         [SerializeField] private float _columnSpace;
         [SerializeField] private Transform _cellsContainer;
         [SerializeField] private Transform _stonesContainer;
-        private Board _board;
         private CellView.Factory _cellViewFactory;
         private StoneView.Factory _stoneFactory;
         private SpriteContainer _stoneSpriteContainer;
@@ -39,7 +38,6 @@ namespace Game.Views
 
         public void CreateBoard(Board board)
         {
-            _board = board;
             ClearAllViews();
             for (var i = 0; i < board.Rows.Count; i++)
             {

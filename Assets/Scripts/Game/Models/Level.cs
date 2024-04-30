@@ -8,8 +8,8 @@ namespace Game.Models
     [CreateAssetMenu(fileName = "Level", menuName = "ScriptableObjects/Level")]
     public class Level : ScriptableObject
     {
-        [SerializeField] private float _time;
-        public float Time => _time;
+        [SerializeField] private int _time;
+        public int Time => _time;
 
         [SerializeField] private Board _board;
 
@@ -46,7 +46,7 @@ namespace Game.Models
 
             public override void OnInspectorGUI()
             {
-                _level._time = EditorGUILayout.FloatField("Time", _level._time);
+                _level._time = EditorGUILayout.IntField("Time", _level._time);
                 var board = _level._board;
                 if (board != null)
                 {

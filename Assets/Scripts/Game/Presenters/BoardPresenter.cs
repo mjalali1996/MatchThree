@@ -10,15 +10,13 @@ namespace Game.Presenters
     public class BoardPresenter : MonoBehaviour
     {
         private IBoardView _boardView;
-        private LevelsContainer _levelsContainer;
         private Board _board;
-        private bool _isBoardInProcess = false;
+        private bool _isBoardInProcess;
 
         [Inject]
-        private void Constructor(IBoardView boardView, LevelsContainer levelsContainer)
+        private void Constructor(IBoardView boardView)
         {
             _boardView = boardView;
-            _levelsContainer = levelsContainer;
         }
 
         private void Awake()
@@ -26,15 +24,9 @@ namespace Game.Presenters
             _boardView.MoveStoneRequested += OnMoveStoneRequested;
         }
 
-        private void Start()
+        public void LoadBoard(Board board)
         {
-            LoadLevel(0);
-        }
-
-        private void LoadLevel(int levelIndex)
-        {
-            var level = _levelsContainer.Levels[levelIndex];
-            _board = level.GetBoard();
+            _board = board;
             InitializeBoard(_board);
         }
 
@@ -61,6 +53,7 @@ namespace Game.Presenters
                 await Explode(explosions);
                 await TryExplodeAutoNewBoard();
             }
+
             _isBoardInProcess = false;
         }
 

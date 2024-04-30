@@ -1,4 +1,5 @@
 using Containers;
+using Game.Presenters;
 using Game.Views;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -17,6 +18,8 @@ namespace Game.Installers
 
         public override void InstallBindings()
         {
+            Container.Bind<GameView>().FromComponentInHierarchy().WhenInjectedInto<GamePresenter>();
+            Container.Bind<BoardPresenter>().FromComponentInHierarchy().WhenInjectedInto<GamePresenter>();
             Container.Bind<IBoardView>().To<BoardView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SpriteContainer>().FromInstance(_stoneSpriteContainer).WhenInjectedInto<BoardView>();
 
