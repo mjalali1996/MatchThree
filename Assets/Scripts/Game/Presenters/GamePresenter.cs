@@ -20,8 +20,16 @@ namespace Game.Presenters
             _gameView = gameView;
         }
 
-        private void Start()
+        private void Awake()
         {
+            _gameView.TimedOut += GameViewOnTimedOut;
+            _gameView.PlayButtonClicked += GameViewOnPlayButtonClicked;
+            _gameView.ShowMenu(true);
+        }
+
+        private void GameViewOnPlayButtonClicked()
+        {
+            _gameView.ShowMenu(false);
             LoadLevel(0);
         }
 
@@ -31,6 +39,11 @@ namespace Game.Presenters
             
             _boardPresenter.LoadBoard(_level.GetBoard());
             _gameView.StartTimer(_level.Time);
+        }
+
+        private void GameViewOnTimedOut()
+        {
+            _gameView.ShowMenu(true);
         }
     }
 }

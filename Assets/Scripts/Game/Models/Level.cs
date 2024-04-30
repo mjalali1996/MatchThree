@@ -46,7 +46,14 @@ namespace Game.Models
 
             public override void OnInspectorGUI()
             {
-                _level._time = EditorGUILayout.IntField("Time", _level._time);
+                var time = EditorGUILayout.IntField("Time", _level._time);
+
+                if (time != _level._time)
+                {
+                    _level._time = time;
+                    SaveData();
+                }
+                
                 var board = _level._board;
                 if (board != null)
                 {

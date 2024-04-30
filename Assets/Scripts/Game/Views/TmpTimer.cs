@@ -12,14 +12,14 @@ namespace Game.Views
         [SerializeField] private TextMeshPro _timerTmp;
         private CancellationTokenSource _cancellationToken;
 
-        public void StartTimer(int seconds)
+        public async void StartTimer(int seconds, Action timedOut)
         {
             Stop();
             _cancellationToken = new CancellationTokenSource();
-            CountDown(seconds, new CancellationToken()).Forget();
+            await CountDown(seconds, timedOut, _cancellationToken.Token);
         }
 
-        private async UniTask CountDown(int seconds, CancellationToken ct)
+        private async UniTask CountDown(int seconds, Action timedOut, CancellationToken ct)
         {
             while (seconds >= 0)
             {
@@ -27,6 +27,8 @@ namespace Game.Views
                 await Task.Delay(TimeSpan.FromSeconds(1), ct);
                 seconds -= 1;
             }
+
+            timedOut?.Invoke();
         }
 
         private void SetTimerText(string seconds)
