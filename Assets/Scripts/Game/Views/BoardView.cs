@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Containers;
+using DG.Tweening;
 using Game.Models;
 using UnityEngine;
 using Zenject;
@@ -15,6 +16,7 @@ namespace Game.Views
         private readonly Dictionary<Vector2Int, CellView> _cellViewsForward = new();
         private readonly Dictionary<CellView, Vector2Int> _cellViewsBackward = new();
         private readonly Dictionary<Vector2Int, StoneView> _stoneViews = new();
+        private readonly List<Vector2Int> _selectedStones = new();
 
         [SerializeField] private float _rowSpace;
         [SerializeField] private float _columnSpace;
@@ -102,18 +104,68 @@ namespace Game.Views
             var stone2 = GetStoneView(end);
 
             SetStoneView(end, stone1);
-            SetLocalPositionByIndex(stone1.transform, end);
-
             SetStoneView(start, stone2);
-            SetLocalPositionByIndex(stone2.transform, start);
+
+            var seq = DOTween.Sequence();
+            seq.Join(MoveTo(stone1.transform, end));
+            seq.Join(MoveTo(stone2.transform, start));
+            await seq.AsyncWaitForCompletion();
         }
 
-        public async Task Explode(List<Vector2Int> explosionCells)
+        public async Task Explode(IReadOnlyList<Vector2Int> explosionCells,
+            IReadOnlyDictionary<Vector2Int, Vector2Int> fallDownStones,
+            IReadOnlyDictionary<Vector2Int, StoneType> newStones)
         {
+            await Explode(explosionCells);
+            await FillBoard(fallDownStones, newStones);
+        }
+
+        private async Task Explode(IReadOnlyList<Vector2Int> explosionCells)
+        {
+            var seq = DOTween.Sequence();
             foreach (var explosionCellPos in explosionCells)
             {
-                GetStoneView(explosionCellPos).Dispose();
+                var stoneView = GetStoneView(explosionCellPos);
+                seq.Join(stoneView.transform.DOScale(0, 0.3f).OnComplete(stoneView.Dispose));
             }
+
+            await seq.AsyncWaitForCompletion();
+        }
+
+        public async Task FillBoard(IReadOnlyDictionary<Vector2Int, Vector2Int> fallDownStones,
+            IReadOnlyDictionary<Vector2Int, StoneType> newStones)
+        {
+            var seq = DOTween.Sequence();
+            foreach (var fallDownStone in fallDownStones)
+            {
+                var stone = GetStoneView(fallDownStone.Key);
+
+                SetStoneView(fallDownStone.Value, stone);
+                seq.Join(MoveTo(stone.transform, fallDownStone.Value));
+            }
+
+            var newStonesInPerColumn = new Dictionary<int, int>();
+            foreach (var newStone in newStones)
+            {
+                newStonesInPerColumn.TryAdd(newStone.Key.x, 0);
+                newStonesInPerColumn[newStone.Key.x] += 1;
+            }
+
+            foreach (var newStone in newStones)
+            {
+                var yStonePos = newStone.Key.y - newStonesInPerColumn[newStone.Key.x] - 1;
+                var stone = CreateStoneView(new Vector2Int(newStone.Key.x, yStonePos), newStone.Value);
+
+                SetStoneView(newStone.Key, stone);
+                seq.Join(MoveTo(stone.transform, newStone.Key));
+            }
+
+            await seq.AsyncWaitForCompletion();
+        }
+
+        private Tween MoveTo(Transform trans, Vector2Int pos)
+        {
+            return trans.DOLocalMove(ConvertIndexesToPosition(pos), 0.3f);
         }
 
         private StoneView GetStoneView(Vector2Int pos)
@@ -153,12 +205,53 @@ namespace Game.Views
         private void CellViewOnClicked(object sender, EventArgs e)
         {
             if (sender is not CellView cellView) return;
+
+            var cellPos = _cellViewsBackward[cellView];
+            if (_selectedStones.Contains(cellPos))
+            {
+                _selectedStones.Remove(cellPos);
+                _stoneViews[cellPos].SetSelected(false);
+                return;
+            }
+
+            _selectedStones.Add(cellPos);
+            _stoneViews[cellPos].SetSelected(true);
+            CheckForSwapSelectedCells();
+        }
+
+        private void CheckForSwapSelectedCells()
+        {
+            if (_selectedStones.Count <= 1) return;
+            var stone1Pos = _selectedStones[0];
+            var stone2Pos = _selectedStones[1];
+            DeselectAllCells();
+
+            if (stone1Pos.x == stone2Pos.x && Mathf.Abs(stone1Pos.y - stone2Pos.y) == 1)
+            {
+                MoveStoneRequested?.Invoke(stone1Pos, stone2Pos);
+            }
+            
+            if (stone1Pos.y == stone2Pos.y && Mathf.Abs(stone1Pos.x - stone2Pos.x) == 1)
+            {
+                MoveStoneRequested?.Invoke(stone1Pos, stone2Pos);
+            }
+        }
+
+        private void DeselectAllCells()
+        {
+            foreach (var selectedStone in _selectedStones)
+            {
+                _stoneViews[selectedStone].SetSelected(false);
+            }
+
+            _selectedStones.Clear();
         }
 
         private void CellViewOnDragged(object sender, Vector2 dir)
         {
             if (sender is not CellView cellView) return;
-
+            DeselectAllCells();
+            
             var cellViewPos = _cellViewsBackward[cellView];
             var direction = Board.GetDirection(dir);
             var fixViewDirection = FixViewDirection(Board.DirectionToVector[direction], new Vector2Int(1, -1));

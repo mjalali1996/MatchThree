@@ -34,14 +34,14 @@ namespace Game.Views
         private void OnMouseDown()
         {
             _isPressed = true;
-            _pressingPosition = Input.mousePosition;
+            _pressingPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
 
         private void OnMouseUp()
         {
             if (!_isPressed) return;
             _isPressed = false;
-            Vector2 currentPosition = Input.mousePosition;
+            Vector2 currentPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             var distanceRange = Vector2.Distance(currentPosition, _pressingPosition);
 
             if (distanceRange < _draggingDetectionRange)

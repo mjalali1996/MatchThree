@@ -98,6 +98,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c08464ca834486a8a77ec548ebc2b67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _spriteRenderer: {fileID: 7652427391757311051}
+  _draggingDetectionRange: 0.1
 --- !u!61 &8751931456884709390
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -12,8 +12,25 @@ namespace Game.Models
         public float Time => _time;
 
         [SerializeField] private Board _board;
-        public Board Board => _board;
 
+        public Board GetBoard()
+        {
+            var dupBoard = new Board();
+            dupBoard.CreateBoard(_board.RowsCount, _board.ColumnsCount);
+            for (var i = 0; i < _board.RowsCount; i++)
+            {
+                for (var j = 0; j < _board.ColumnsCount; j++)
+                {
+                    var dupCell = new BoardCell
+                    {
+                        StoneType = _board.Rows[i].Columns[j].StoneType
+                    };
+                    dupBoard.Rows[i].Columns[j] = dupCell;
+                }
+            }
+
+            return dupBoard;
+        }
 
         [CustomEditor(typeof(Level))]
         public class LevelEditor : Editor
@@ -41,7 +58,14 @@ namespace Game.Models
                         for (var j = 0; j < row.Columns.Count; j++)
                         {
                             var cell = row.Columns[j];
-                            cell.StoneType = (StoneType)EditorGUILayout.EnumPopup(cell.StoneType);
+                            var newValue = (StoneType)EditorGUILayout.EnumPopup(cell.StoneType);
+                            if (newValue != cell.StoneType)
+                            {
+                                cell.StoneType = newValue;
+                                var so = new SerializedObject(target);
+                                so.Update();
+                                so.ApplyModifiedProperties();
+                            }
                         }
 
                         EditorGUILayout.EndVertical();
@@ -49,6 +73,7 @@ namespace Game.Models
 
                     EditorGUILayout.EndHorizontal();
                 }
+
 
 
                 EditorGUILayout.Separator();

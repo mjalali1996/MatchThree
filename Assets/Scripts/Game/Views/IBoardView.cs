@@ -12,6 +12,10 @@ namespace Game.Views
         public event TransitionDelegate MoveStoneRequested;
         public void CreateBoard(Board board);
         Task SwapStone(Vector2Int start, Vector2Int end);
-        Task Explode(List<Vector2Int> explosionCells);
+
+        Task Explode(IReadOnlyList<Vector2Int> explosionCells,
+            IReadOnlyDictionary<Vector2Int, Vector2Int> fallDownStones,
+            IReadOnlyDictionary<Vector2Int, StoneType> newStones);
+
     }
 }

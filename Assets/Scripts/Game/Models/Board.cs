@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Game.Models
 {
@@ -12,15 +13,6 @@ namespace Game.Models
 
         [SerializeField] private List<BoardRow> _rows = new();
         public IReadOnlyList<BoardRow> Rows => _rows;
-
-        public Board()
-        {
-        }
-
-        public Board(Board board)
-        {
-            _rows = new List<BoardRow>(board.Rows);
-        }
 
         public void CreateBoard(int rows, int columns)
         {
@@ -58,7 +50,7 @@ namespace Game.Models
             return GetCell(pos).StoneType;
         }
 
-        private void SetStone(Vector2Int pos, StoneType stone)
+        public void SetStone(Vector2Int pos, StoneType stone)
         {
             _rows[pos.x].Columns[pos.y].StoneType = stone;
         }
@@ -75,12 +67,56 @@ namespace Game.Models
             return IsCellPosValid(pos, RowsCount, ColumnsCount);
         }
 
-        public void Explode(List<Vector2Int> explosionCells)
+        public void Explode(List<Vector2Int> explosionStones)
         {
-            foreach (var explosionCellPos in explosionCells)
+            foreach (var explosionCellPos in explosionStones)
             {
                 SetStone(explosionCellPos, StoneType.None);
             }
+        }
+
+        public Dictionary<Vector2Int, Vector2Int> GetFallDownStones()
+        {
+            var fallDownStones = new Dictionary<Vector2Int, Vector2Int>();
+            for (var i = RowsCount - 1; i >= 0; i--)
+            {
+                var verticalEmptyCellsCounter = 0;
+                for (var j = ColumnsCount - 1; j >= 0; j--)
+                {
+                    var pos = new Vector2Int(i, j);
+                    var cell = GetCell(pos);
+                    if (cell.StoneType == StoneType.None)
+                    {
+                        verticalEmptyCellsCounter++;
+                        continue;
+                    }
+
+                    if (verticalEmptyCellsCounter != 0)
+                        fallDownStones.Add(pos, new Vector2Int(i, j + verticalEmptyCellsCounter));
+                }
+            }
+
+            return fallDownStones;
+        }
+
+        public Dictionary<Vector2Int, StoneType> GetNewStones()
+        {
+            var newStones = new Dictionary<Vector2Int, StoneType>();
+            var stoneTypesCount = Enum.GetValues(typeof(StoneType)).Length;
+            for (var j = ColumnsCount - 1; j >= 0; j--)
+            {
+                for (var i = RowsCount - 1; i >= 0; i--)
+                {
+                    var pos = new Vector2Int(i, j);
+                    var cell = GetCell(pos);
+                    if (cell.StoneType == StoneType.None)
+                    {
+                        newStones.Add(pos, (StoneType)Random.Range(1, stoneTypesCount));
+                    }
+                }
+            }
+
+            return newStones;
         }
     }
 }
