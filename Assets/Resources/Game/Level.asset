@@ -30,7 +30,7 @@ MonoBehaviour:
       - StoneType: 5
       - StoneType: 1
       - StoneType: 5
-      - StoneType: 1
+      - StoneType: 2
       - StoneType: 2
       - StoneType: 4
     - _columns:
@@ -58,7 +58,7 @@ MonoBehaviour:
       - StoneType: 2
       - StoneType: 3
       - StoneType: 3
-      - StoneType: 3
+      - StoneType: 1
       - StoneType: 3
     - _columns:
       - StoneType: 2
@@ -70,7 +70,7 @@ MonoBehaviour:
       - StoneType: 1
       - StoneType: 3
     - _columns:
-      - StoneType: 2
+      - StoneType: 4
       - StoneType: 4
       - StoneType: 5
       - StoneType: 4
