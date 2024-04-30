@@ -41,7 +41,7 @@ namespace Game.Models
 
             private void Awake()
             {
-                _level = target as Level;
+                _level = serializedObject.targetObject as Level;
             }
 
             public override void OnInspectorGUI()
@@ -62,9 +62,7 @@ namespace Game.Models
                             if (newValue != cell.StoneType)
                             {
                                 cell.StoneType = newValue;
-                                var so = new SerializedObject(target);
-                                so.Update();
-                                so.ApplyModifiedProperties();
+                                SaveData();
                             }
                         }
 
@@ -73,7 +71,6 @@ namespace Game.Models
 
                     EditorGUILayout.EndHorizontal();
                 }
-
 
 
                 EditorGUILayout.Separator();
@@ -86,6 +83,8 @@ namespace Game.Models
                             cell.StoneType = (StoneType)Random.Range(1, Enum.GetValues(typeof(StoneType)).Length);
                         }
                     }
+                    
+                    SaveData();
                 }
 
 
@@ -99,7 +98,15 @@ namespace Game.Models
                 {
                     _level._board = new Board();
                     _level._board.CreateBoard(_rows, _columns);
+                    SaveData();
                 }
+            }
+
+            private void SaveData()
+            {
+                EditorUtility.SetDirty(target);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
             }
         }
     }
